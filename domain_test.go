@@ -3627,10 +3627,53 @@ var domainTestData = []struct {
 		Expected: []string{
 			`<hostdev mode="subsystem" type="usb">`,
 			`  <source guestReset="on" startupPolicy="optional">`,
-			`    <product id="0xbeef"></product>`,
 			`    <vendor id="0x1234"></vendor>`,
+			`    <product id="0xbeef"></product>`,
 			`  </source>`,
 			`</hostdev>`,
+		},
+	},
+	{
+		Object: &Domain{
+			Type: "kvm",
+			Name: "usb-passthrough",
+			Devices: &DomainDeviceList{
+				Hostdevs: []DomainHostdev{
+					DomainHostdev{
+						Managed: "yes",
+						SubsysUSB: &DomainHostdevSubsysUSB{
+							Source: &DomainHostdevSubsysUSBSource{
+								StartUpPolicy: "optional",
+								GuestReset:    "off",
+								Vendor: &DomainHostDevProductVendorID{
+									ID: "0x1234",
+								},
+								Product: &DomainHostDevProductVendorID{
+									ID: "0xbeef",
+								},
+								Address: &DomainAddressUSB{
+									Bus:    &usbHostBus,
+									Device: &usbHostDevice,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Expected: []string{
+			`<domain type="kvm">`,
+			`  <name>usb-passthrough</name>`,
+			`  <devices>`,
+			`    <hostdev mode="subsystem" type="usb" managed="yes">`,
+			`      <source guestReset="off" startupPolicy="optional">`,
+			`        <vendor id="0x1234"></vendor>`,
+			`        <product id="0xbeef"></product>`,
+			`        <address bus="14" device="6"></address>`,
+			`      </source>`,
+			`    </hostdev>`,
+			`  </devices>`,
+			`</domain>`,
 		},
 	},
 	{
